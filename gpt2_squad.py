@@ -38,7 +38,7 @@ from tqdm import tqdm, trange
 
 from gpt2sqa.file_utils import PYTORCH_PRETRAINED_GPT2_CACHE, WEIGHTS_NAME, CONFIG_NAME
 from gpt2sqa.modeling_gpt2 import GPT2ModelForQuestionAnswering
-from gpt2sqa.optimization import GPT2Adam, WarmupLinearSchedule
+from transformers.optimization import AdamW 
 from transformers import GPT2Tokenizer
 from gpt2sqa.squad.squad_example import InputFeatures
 from gpt2sqa.squad.utils import convert_examples_to_features, read_squad_examples, get_final_text, write_predictions, _check_is_max_context, _get_best_indexes, _compute_softmax, RawResult
@@ -199,10 +199,8 @@ def main():
     if num_train_optimization_steps is None:
         num_train_optimization_steps = 1
 
-    optimizer = GPT2Adam(optimizer_grouped_parameters,
-                         lr=args.learning_rate,
-                         warmup=args.warmup_proportion,
-                         t_total=num_train_optimization_steps)
+    optimizer = AdamW(optimizer_grouped_parameters,
+                         lr=args.learning_rate)
 
     global_step = 0
     if args.do_train:
