@@ -231,7 +231,6 @@ def main():
 
         model.train()
         total_loss = 0
-        losses = []
         pbar = tqdm(train_dataloader, disable=args.local_rank not in [-1, 0])
         for _ in trange(int(args.num_train_epochs), desc="Epoch"):
             for step, batch in enumerate(pbar):
@@ -249,10 +248,7 @@ def main():
                 pbar.update(1)
                 if step % 10 == 0:
                     pbar.set_description(desc=f'loss:{np.mean(total_loss)}')
-                    losses.append(np.mean(total_loss))
                     total_loss = 0
-                if (step + 1) % 100 == 0:
-                    print("Avg loss for 100 iterations is", np.mean(losses[:10]))
                 if (step + 1) % args.gradient_accumulation_steps == 0:
                     optimizer.step()
                     optimizer.zero_grad()
