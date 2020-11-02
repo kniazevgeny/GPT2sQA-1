@@ -30,10 +30,10 @@ except ImportError:
 try:
     from pathlib import Path
     PYTORCH_PRETRAINED_GPT2_CACHE = Path(os.getenv('PYTORCH_PRETRAINED_BERT_CACHE',
-                                                   Path.home() / '.pytorch_pretrained_bert'))
+                                                   Path.home() / 'pytorch_rugpt3'))
 except (AttributeError, ImportError):
     PYTORCH_PRETRAINED_GPT2_CACHE = os.getenv('PYTORCH_PRETRAINED_BERT_CACHE',
-                                              os.path.join(os.path.expanduser("~"), '.pytorch_pretrained_bert'))
+                                              os.path.join(os.path.expanduser("~"), 'pytorch_rugpt3'))
 
 CONFIG_NAME = "config.json"
 WEIGHTS_NAME = "pytorch_model.bin"

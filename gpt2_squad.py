@@ -39,7 +39,7 @@ from tqdm import tqdm, trange
 from gpt2sqa.file_utils import PYTORCH_PRETRAINED_GPT2_CACHE, WEIGHTS_NAME, CONFIG_NAME
 from gpt2sqa.modeling_gpt2 import GPT2ModelForQuestionAnswering
 from gpt2sqa.optimization import GPT2Adam, WarmupLinearSchedule
-from gpt2sqa.tokenization import GPT2Tokenizer
+from transformers import GPT2Tokenizer
 from gpt2sqa.squad.squad_example import InputFeatures
 from gpt2sqa.squad.utils import convert_examples_to_features, read_squad_examples, get_final_text, write_predictions, _check_is_max_context, _get_best_indexes, _compute_softmax, RawResult
 logger = logging.getLogger(__name__)
@@ -51,7 +51,7 @@ def main():
     # Required parameters
     parser.add_argument("--output_dir", default=None, type=str, required=True,
                         help="The output directory where the model checkpoints and predictions will be written.")
-
+    parser.add_argument("--model_name", default="ruGPT3Medium", type=str, help="ruGPT3Small or ruGPT3Medium or ruGPT3Large")
     # Other parameters
     parser.add_argument("--train_file", default=None, type=str, help="SQuAD json for training. E.g., train-v1.1.json")
     parser.add_argument("--predict_file", default=None, type=str,
@@ -158,7 +158,7 @@ def main():
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
 
-    tokenizer = GPT2Tokenizer.from_pretrained()
+    tokenizer = GPT2Tokenizer.from_pretrained("sberbank-ai/rugpt3large_based_on_gpt2")
 
     train_examples = None
     num_train_optimization_steps = None
@@ -169,7 +169,7 @@ def main():
             num_train_optimization_steps = num_train_optimization_steps // torch.distributed.get_world_size()
 
     # Prepare model
-    model = GPT2ModelForQuestionAnswering.from_pretrained(cache_dir=os.path.join(str(PYTORCH_PRETRAINED_GPT2_CACHE), 'distributed_{}'.format(args.local_rank)))
+    model = GPT2ModelForQuestionAnswering.from_pretrained(cache_dir=PYTORCH_PRETRAINED_GPT2_CACHE, pretrained_model_name_or_path=args.model_name)
 
     model.to(device)
     if args.local_rank != -1:
@@ -271,7 +271,7 @@ def main():
         model = GPT2ModelForQuestionAnswering.from_pretrained(args.output_dir)
         tokenizer = GPT2Tokenizer.from_pretrained(args.output_dir)
     else:
-        model = GPT2ModelForQuestionAnswering.from_pretrained()
+        model = GPT2ModelForQuestionAnswering.from_pretrained(cache_dir=PYTORCH_PRETRAINED_GPT2_CACHE, pretrained_model_name_or_path=args.model_name)
 
     model.to(device)
 
