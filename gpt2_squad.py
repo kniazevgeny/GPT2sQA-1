@@ -287,8 +287,7 @@ def main():
             max_seq_length=args.max_seq_length,
             doc_stride=args.doc_stride,
             max_query_length=args.max_query_length,
-            is_training=False,
-            version_2_with_negative=args.with_negative)
+            is_training=False,)
 
         logger.info("***** Running predictions *****")
         logger.info("  Num orig examples = %d", len(eval_examples))
