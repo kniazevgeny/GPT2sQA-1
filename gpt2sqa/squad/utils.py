@@ -151,12 +151,12 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
             token_to_orig_map = {}
             token_is_max_context = {}
             segment_ids = []
-            tokens.append("[CLS]")
+            tokens.append("<s>")
             segment_ids.append(0)
             for token in query_tokens:
                 tokens.append(token)
                 segment_ids.append(0)
-            tokens.append("[SEP]")
+            tokens.append("¦")
             segment_ids.append(0)
 
             for i in range(doc_span.length):
@@ -168,7 +168,7 @@ def convert_examples_to_features(examples, tokenizer, max_seq_length,
                 token_is_max_context[len(tokens)] = is_max_context
                 tokens.append(all_doc_tokens[split_token_index])
                 segment_ids.append(1)
-            tokens.append("[SEP]")
+            tokens.append("¦")
             segment_ids.append(1)
 
             input_ids = tokenizer.convert_tokens_to_ids(tokens)
