@@ -52,6 +52,7 @@ def main():
     parser.add_argument("--output_dir", default=None, type=str, required=True,
                         help="The output directory where the model checkpoints and predictions will be written.")
     parser.add_argument("--model_name", default="ruGPT3Medium", type=str, help="ruGPT3Small or ruGPT3Medium or ruGPT3Large")
+    parser.add_argument("--with_negative", default=False, type=str, help="version 2 with negative or not")
     # Other parameters
     parser.add_argument("--train_file", default=None, type=str, help="SQuAD json for training. E.g., train-v1.1.json")
     parser.add_argument("--predict_file", default=None, type=str,
@@ -163,7 +164,7 @@ def main():
     train_examples = None
     num_train_optimization_steps = None
     if args.do_train:
-        train_examples = read_squad_examples(input_file=args.train_file, is_training=True)   
+        train_examples = read_squad_examples(input_file=args.train_file, is_training=True, version_2_with_negative=args.with_negative)   
         num_train_optimization_steps = int(len(train_examples) / args.train_batch_size / args.gradient_accumulation_steps) * args.num_train_epochs
         if args.local_rank != -1:
             num_train_optimization_steps = num_train_optimization_steps // torch.distributed.get_world_size()
@@ -284,7 +285,8 @@ def main():
             max_seq_length=args.max_seq_length,
             doc_stride=args.doc_stride,
             max_query_length=args.max_query_length,
-            is_training=False)
+            is_training=False,
+            version_2_with_negative=args.with_negative)
 
         logger.info("***** Running predictions *****")
         logger.info("  Num orig examples = %d", len(eval_examples))
