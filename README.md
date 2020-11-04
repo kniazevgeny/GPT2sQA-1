@@ -5,20 +5,23 @@ This repo includes an experiment of fine-tuning ruGPT-3Large for Question Answer
 SQuAD data can be downloaded from: https://github.com/rajpurkar/SQuAD-explorer/tree/master/dataset
 SberQuAD data can be downloaded from: https://github.com/kniazevgeny/BERT-QA-fine-tuning
 
-To train and validate the model: 
+## To train and validate the model: 
 ### GPU or CPU
 
 ```
-python gpt2_squad.py --output_dir=output/ --train_file=data/train-v2.0.json --do_train --train_batch_size=8 --predict_file=data/dev-v2.0.json --do_predict
+python gpt2_squad.py --output_dir=output/ --train_file=data/train-v2.0.json --do_train --train_batch_size=8 --predict_file=data/dev-v2.0.json --do_predict --model_name=ruGPT3Small
 
 ```
+Also, you could specify model name. Use --model_name arg. Example: --model_name=ruGPT3Large
+
+Only 3 models are avaliable: ruGPT3Small, ruGPT3Medium and ruGPT3Large
 ### TPU (Colab)
 ```
 python gpt2_squad_tpu.py --output_dir=output/ --train_file=data/train-v2.0.json --do_train --train_batch_size=32 --predict_file=data/dev-v2.0.json --do_predict
 
 ```
 
-To evaluate: 
+## To evaluate: 
 
 ```
 
