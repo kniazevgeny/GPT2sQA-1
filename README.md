@@ -1,9 +1,9 @@
 # ruGPT3 for QA
 
-This repo includes an experiment of fine-tuning ruGPT-3Large for Question Answering (QA). It also runs the model on Stanford Question Answering Dataset 2.0 (SQuAD) - like dataset: sberquad. It uses Huggingface Inc.'s PyTorch implementation of ruGPT-3 and adapts from their fine-tuning of BERT for QA. 
+This repo includes an experiment of fine-tuning ruGPT-3Large for Question Answering (QA). It also runs the model on SQuAD - like dataset: sberquad. It uses Huggingface Inc.'s PyTorch implementation of ruGPT-3 and adapts from their fine-tuning of BERT for QA. 
 
 SQuAD data can be downloaded from: https://github.com/rajpurkar/SQuAD-explorer/tree/master/dataset
-SberQuAD data can be downloaded from: 
+SberQuAD data can be downloaded from: https://github.com/kniazevgeny/BERT-QA-fine-tuning
 
 To train and validate the model: 
 ### GPU or CPU
