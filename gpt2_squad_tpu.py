@@ -121,7 +121,7 @@ def main():
     args = parser.parse_args()
     print(args)
     os.environ['XLA_USE_BF16'] = '1'
-    os.environ['TRIM_GRAPH_SIZE'] = '1000000'
+    os.environ['TRIM_GRAPH_SIZE'] = '10000000'
 
     logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                         datefmt='%m/%d/%Y %H:%M:%S',
@@ -266,27 +266,27 @@ def main():
                     if step % 10 == 0 and xm.is_master_ordinal() and step:
                         pbar.set_description(desc=f'loss : {np.mean(losses[10:])}')
                     if xm.is_master_ordinal() and ((step + 1) % 1000 == 0) or step + 1 == len(device_loader):
-                        print(f"\navg loss for 1000 steps = {np.mean(losses[999:])}")
+                        print(f"\navg loss for 1000 steps = {np.mean(losses)}")
                         losses = []
                     xm.optimizer_step(optimizer)
                     global_step += 1
-            xm.rendezvous('save_model')
-            w_model.to("cpu")
-            if xm.is_master_ordinal():
-                print("\nSaving model...")
-                print(w_model == model)
-                # torch_xla.utils.serialization.save(model, args.output_dir, master_only=True, global_master=True)
-                # Save a trained model, configuration and tokenizer
-                model_to_save = w_model.module if hasattr(
-                    model, 'module') else w_model  # Only save the model it-self
-                
-                # If we save using the predefined names, we can load using `from_pretrained`
-                output_model_file = os.path.join(args.output_dir, WEIGHTS_NAME)
-                output_config_file = os.path.join(args.output_dir, CONFIG_NAME)
-                # xm.save(model, output_model_file, master_only=True, global_master=False)
-                torch.save(model_to_save.state_dict(), output_model_file)
-                model_to_save.config.to_json_file(output_config_file)
-                tokenizer.save_vocabulary(args.output_dir)
+                xm.rendezvous('save_model')
+                w_model.to("cpu")
+                if xm.is_master_ordinal():
+                    print("\nSaving model...")
+                    print(w_model == model)
+                    # torch_xla.utils.serialization.save(model, args.output_dir, master_only=True, global_master=True)
+                    # Save a trained model, configuration and tokenizer
+                    model_to_save = w_model.module if hasattr(
+                        model, 'module') else w_model  # Only save the model it-self
+                    
+                    # If we save using the predefined names, we can load using `from_pretrained`
+                    output_model_file = os.path.join(args.output_dir, WEIGHTS_NAME)
+                    output_config_file = os.path.join(args.output_dir, CONFIG_NAME)
+                    # xm.save(model, output_model_file, master_only=True, global_master=False)
+                    torch.save(model_to_save.state_dict(), output_model_file)
+                    model_to_save.config.to_json_file(output_config_file)
+                    tokenizer.save_vocabulary(args.output_dir)
         # train_fn(device_loader)
         xmp.spawn(train_fn, args=(train_data, ), nprocs=1, start_method='fork')
         
