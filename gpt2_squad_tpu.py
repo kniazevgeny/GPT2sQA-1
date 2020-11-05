@@ -120,7 +120,8 @@ def main():
                         help="If null_score - best_non_null is greater than the threshold predict null.")
     args = parser.parse_args()
     print(args)
-    n_gpu = torch.cuda.device_count()
+    os.environ['XLA_USE_BF16'] = '1'
+    os.environ['TRIM_GRAPH_SIZE'] = '1000000'
 
     logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                         datefmt='%m/%d/%Y %H:%M:%S',
@@ -219,7 +220,7 @@ def main():
                 rank=xm.get_ordinal(),
                 shuffle=True)
             train_dataloader = DataLoader(
-                train_data, sampler=train_sampler, batch_size=args.train_batch_size, num_workers=2, drop_last=True)
+                train_data, sampler=train_sampler, batch_size=args.train_batch_size, num_workers=1, drop_last=True)
             global_step = 0
             losses = []
             w_model = WRAPPED_MODEL.to(device)
@@ -266,6 +267,7 @@ def main():
                         pbar.set_description(desc=f'loss : {np.mean(losses[10:])}')
                     if xm.is_master_ordinal() and ((step + 1) % 1000 == 0) or step + 1 == len(device_loader):
                         print(f"\navg loss for 1000 steps = {np.mean(losses[999:])}")
+                        losses = []
                     xm.optimizer_step(optimizer)
                     global_step += 1
             xm.rendezvous('save_model')
