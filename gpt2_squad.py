@@ -230,9 +230,10 @@ def main():
         train_dataloader = DataLoader(train_data, sampler=train_sampler, batch_size=args.train_batch_size)
 
         model.train()
-        total_loss = 0
-        pbar = tqdm(train_dataloader, disable=args.local_rank not in [-1, 0])
-        for _ in trange(int(args.num_train_epochs), desc="Epoch"):
+        losses = []
+        for epoch in range(int(args.num_train_epochs)):
+            print(f"\n\nEpoch n.{epoch + 1}/{args.num_train_epochs} started")
+            pbar = tqdm(train_dataloader, disable=args.local_rank not in [-1, 0], leave=True, position=0)
             for step, batch in enumerate(pbar):
                 if n_gpu == 1:
                     batch = tuple(t.to(device) for t in batch)  # multi-gpu does scattering it-self
@@ -242,13 +243,11 @@ def main():
                     loss = loss.mean()  # mean() to average on multi-gpu.
                 if args.gradient_accumulation_steps > 1:
                     loss = loss / args.gradient_accumulation_steps
-                total_loss += loss.item()
-
+                losses.append(loss.item())
                 loss.backward()
                 pbar.update(1)
-                if step % 10 == 0:
-                    pbar.set_description(desc=f'loss:{np.mean(total_loss)}')
-                    total_loss = 0
+                if step % 10 == 0 and step:
+                    pbar.set_description(desc=f'loss:{np.mean(losses[10:])}')
                 if (step + 1) % args.gradient_accumulation_steps == 0:
                     optimizer.step()
                     optimizer.zero_grad()
